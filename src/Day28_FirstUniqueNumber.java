@@ -70,6 +70,7 @@ import java.util.HashMap;
  * At most 50000 calls will be made to showFirstUnique and add.
  */
 public class Day28_FirstUniqueNumber {
+    //109 ms not enough submitted solutions for rank
     class FirstUnique {
         HashMap<Integer, Node> map;
         Node head;
