@@ -1,4 +1,4 @@
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -28,26 +28,81 @@ import java.util.Map;
  */
 
 public class Day24_LRUCache {
-    //12ms beats 95.12%
+    //11ms beats 99.9%
     class LRUCache {
-        LinkedHashMap<Integer, Integer> map;
+        HashMap<Integer, Node> map;
+        Node head;
+        Node last;
+        int size;
+        int capacity;
+
+        class Node {
+            int key;
+            int val;
+            Node prev;
+            Node next;
+        }
 
         public LRUCache(int capacity) {
-            map = new LinkedHashMap<Integer, Integer>(4, 0.75f, true) {
-                protected boolean removeEldestEntry(Map.Entry<Integer, Integer> eldest) {
-                    return size() > capacity;
-                }
-            };
+            this.capacity = capacity;
+            map = new HashMap(4,0.8f);
         }
 
         public int get(int key) {
-            Integer res = map.get(key);
-            if (res != null) return res;
+            System.out.println("get " + key);
+            if (map.containsKey(key)) {
+                Node node = map.get(key);
+                if (node == head) return node.val;
+                node.prev.next = node.next;
+                if (node != last) node.next.prev = node.prev;
+                else last = last.prev;
+                node.next = head;
+                head.prev = node;
+                head = node;
+                return node.val;
+            }
             return -1;
         }
 
         public void put(int key, int value) {
-            map.put(key, value);
+            System.out.println("put " + key);
+            if (!map.containsKey(key)) {
+                Node node = new Node();
+                node.key = key;
+                node.val = value;
+                if (head == null) {
+                    head = node;
+                    last = head;
+                } else {
+                    node.next = head;
+                    head.prev = node;
+                    head = node;
+                }
+                map.put(key, node);
+                if (size < capacity)
+                    size++;
+                else {
+                    System.out.println(key);
+                    System.out.println(last.key);
+                    map.remove(last.key);
+                    System.out.println(map.containsKey(last.key));
+                    last = last.prev;
+                    last.next = null;
+                    System.out.println(last.key);
+                }
+
+
+            } else {
+                Node node = map.get(key);
+                node.val = value;
+                if (node == head) return;
+                node.prev.next = node.next;
+                if (node != last) node.next.prev = node.prev;
+                else last = last.prev;
+                node.next = head;
+                head.prev = node;
+                head = node;
+            }
         }
     }
 }
